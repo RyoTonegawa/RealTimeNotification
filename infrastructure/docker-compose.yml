@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ../backend/migrations:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
+  backend:
+    build:
+      context: ../backend
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      BACKEND_PORT: 3001
+      DATABASE_URL: postgres://app:app@postgres:5432/app?sslmode=disable
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      TENANT_IDS: 11111111-1111-1111-1111-111111111111
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001
+      OUTBOX_BATCH_SIZE: 50
+      OUTBOX_INTERVAL_MS: 500
+    ports:
+      - '3001:3001'
+
+  frontend:
+    build:
+      context: ../frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
+      NEXT_INTERNAL_API_BASE_URL: http://backend:3001
+      NEXT_PUBLIC_TENANT_ID: 11111111-1111-1111-1111-111111111111
+    ports:
+      - '3000:3000'
+
+volumes:
+  pg-data:
+  redis-data:

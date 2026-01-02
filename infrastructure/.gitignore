@@ -1,0 +1,10 @@
+# Compose artifacts
+*.log
+*.pid
+
+# Local volumes
+redis-data/
+
+# IDE
+.vscode/
+.idea/

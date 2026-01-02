@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id        BigInt   @id @default(autoincrement())
+  tenantId  String   @map("tenant_id") @db.Uuid
+  payload   Json
+  createdAt DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+  outbox    Outbox?
+
+  @@map("events")
+}
+
+model Outbox {
+  id          BigInt    @id @default(autoincrement())
+  tenantId    String    @map("tenant_id") @db.Uuid
+  eventId     String    @map("event_id")
+  eventType   String    @map("event_type")
+  aggregateId BigInt    @map("aggregate_id") @unique
+  payload     Json
+  createdAt   DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+  event       Event     @relation(fields: [aggregateId], references: [id])
+
+  @@unique([tenantId, eventId])
+  @@map("outbox")
+}
