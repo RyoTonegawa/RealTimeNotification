@@ -5,8 +5,8 @@
 
 ## 環境変数
 ```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3001          # ブラウザから見たバックエンド URL
-NEXT_INTERNAL_API_BASE_URL=http://backend:3001          # (任意) SSR 用の内部 URL (Docker 利用時など)
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080          # ブラウザから見たバックエンド URL
+NEXT_INTERNAL_API_BASE_URL=http://backend:8080          # (任意) SSR 用の内部 URL (Docker 利用時など)
 NEXT_PUBLIC_TENANT_ID=11111111-1111-1111-1111-111111111111
 ```
 

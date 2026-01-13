@@ -12,6 +12,15 @@ cd infrastructure
 docker compose up --build
 ```
 
+### Redis/Postgres only (run backend/frontend locally)
+```bash
+cd infrastructure
+docker compose up postgres redis
+```
+Then start the apps from VSCode terminals:
+- `cd backend && npm run start:dev`
+- `cd frontend && npm run dev`
+
 シードデータは以下で投入できます（Transactional Outbox フローを模倣します）。
 
 ```bash

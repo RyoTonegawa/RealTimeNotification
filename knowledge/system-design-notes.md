@@ -25,3 +25,11 @@
 - `EventSource` は再接続時に `Last-Event-ID` ヘッダを自動送信するため、`/sse` は `lastEventId` と `after` の両方を受け付ける。
 - 動作確認: ブラウザで SSE を接続した状態でネットワークを一時的に切断→復帰し、サーバーログを確認。`requestedCursor = after || lastEventId` によって再接続後も `aggregateId` フィルタが働き、重複せずに続きから配信される。
 - 手動検証: `curl -H 'Last-Event-ID: <event_id>' 'http://localhost:3001/sse?tenantId=...&after='` のようにヘッダだけ指定しても同じ結果になる（`after` を空にするとヘッダが優先される）。
+
+## Outbox event_id vs aggregate_id
+- **event_id (ULID)**: 外部公開するイベント識別子。SSE の `id:` や `Last-Event-ID`、他サービスとの交信や冪等性キーに利用する。時系列でソートできる文字列が目的。
+- **aggregate_id (BIGINT)**: `events.id` (BIGSERIAL) を参照する内部 ID。REST で取得した最新 ID から SSE を再開するためのカーソルや、DB 上での順序保証に使う。
+- **なぜ両方必要か**
+  - `aggregate_id` のみだと、外部向けのユニーク ID (ULID) が無くなり、SSE の `Last-Event-ID` や冪等制御に不便。
+  - `event_id` のみだと、DB の `events` table との結びつきが薄れ、`events.id` ベースで REST/SSE を一貫させるのが難しい（特に SQL で降順 LIMIT を取った時のカーソル計算）。
+  - 役割が違うため冗長ではなく、どちらも持つことで実装がシンプルになる。

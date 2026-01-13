@@ -13,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">{children}</div>
+      </body>
     </html>
   );
 }
