@@ -16,7 +16,9 @@ model Event {
 
   @@map("events")
 }
-
+// 未配信イベントをOutbox tableに登録する。
+// Aggregate Id(Event.id)を参照することでどこまでのイベントが送信済みか？をOutboxテーブルで参照可能にする
+// EventIdはイベントの一意の識別子。AggregateIdは並び順の保証。
 model Outbox {
   id          BigInt    @id @default(autoincrement())
   tenantId    String    @map("tenant_id") @db.Uuid

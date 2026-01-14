@@ -37,7 +37,7 @@ export default registerAs('app', (): EnvConfig => ({
       .map((origin) => origin.trim())
       .filter(Boolean) ?? ['*'],
   worker: {
-    batchSize: parseInt(process.env.OUTBOX_BATCH_SIZE ?? '50', 10),
+    batchSize: parseInt(process.env.OUTBOX_BATCH_SIZE ?? '500', 10),
     intervalMs: parseInt(process.env.OUTBOX_INTERVAL_MS ?? '500', 10),
   },
 }));

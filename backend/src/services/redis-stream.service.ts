@@ -10,12 +10,15 @@ type StreamEntry = {
 @Injectable()
 export class RedisStreamService implements OnModuleDestroy {
   private readonly client: Redis;
+  private readonly blockingClient: Redis;
 
   constructor(private readonly config: ConfigService) {
     this.client = new Redis({
       host: this.config.get<string>('app.redis.host'),
       port: this.config.get<number>('app.redis.port'),
     });
+    // ブロッキング読み取りと書き込みを同一コネクションで混在させない
+    this.blockingClient = this.client.duplicate();
   }
 
   streamKey(tenantId: string) {
@@ -42,7 +45,7 @@ export class RedisStreamService implements OnModuleDestroy {
 
   async xreadBlocking(key: string, cursor: string, blockMs = 15000): Promise<StreamEntry[]> {
     // イベントが到着するかタイムアウトするまでblockMsで待機、STREAMSで指定したキーについて、cursorよりあとを読み出す
-    const response = await this.client.xread('BLOCK', blockMs, 'STREAMS', key, cursor);
+    const response = await this.blockingClient.xread('BLOCK', blockMs, 'STREAMS', key, cursor);
     if (!response) return [];
     // キーは無視してfieldとvalueの一時配列を読み出す
     const [, entries] = response[0];
@@ -51,6 +54,7 @@ export class RedisStreamService implements OnModuleDestroy {
 
   async onModuleDestroy() {
     await this.client.quit();
+    await this.blockingClient.quit();
   }
 
   private toFieldMap(values: string[]): Record<string, string> {

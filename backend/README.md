@@ -1,23 +1,23 @@
-# NestJS SSE Backend
+# NestJS SSE バックエンド
 
-Implements transactional outbox + Redis Streams fan-out.
+トランザクショナルアウトボックス + Redis Streams のファンアウトを実装。
 
-## Endpoints
-- `GET /events?limit=50` initial fetch (requires `x-tenant-id`).
-- `POST /events` insert a new payload (body: `{ "payload": {...}, "eventType": "EventCreated" }`).
+## エンドポイント
+- `GET /events?limit=50` 初期取得（`x-tenant-id` が必須）。
+- `POST /events` 新規イベントを挿入（body: `{ "payload": {...}, "eventType": "EventCreated" }`）。
   ```bash
   curl -X POST http://localhost:3001/events \
     -H 'x-tenant-id: 11111111-1111-1111-1111-111111111111' \
     -H 'Content-Type: application/json' \
     -d '{"payload":{"message":"hello"}}'
   ```
-- `GET /sse?after=<cursor>` SSE stream; also honors `Last-Event-ID`.
-- Swagger UI available at `http://localhost:3001/docs`.
+- `GET /sse?after=<cursor>` SSEストリーム。`Last-Event-ID` も参照します。
+- Swagger UI: `http://localhost:3001/docs`
 
-## Worker
-`OutboxWorkerService` polls the `outbox` table for each tenant and publishes events to Redis Streams. SSE consumers read from the stream and emit `id: <event_id>` lines.
+## ワーカー
+`OutboxWorkerService` がテナントごとに `outbox` テーブルをポーリングし、Redis Streams に発行。SSEの購読側はストリームから読み取り、`id: <event_id>` を付けて配信する。
 
-## Commands
+## コマンド
 - `npm install`
 - `npm run prisma:generate` (re-run when `prisma/schema.prisma` changes)
 - `npm run migration:run`

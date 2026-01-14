@@ -1,7 +1,7 @@
 # Frontend (Next.js App Router)
 
-- 初回アクセス時に `GET /events?limit=50` (Nest backend) を叩いて最新 50 件を取得します。
-- 取得したカーソルを `EventSource("/sse?after=<cursor>&tenantId=<uuid>")` に渡し、Redis Streams 経由の新着イベントを SSE で受け取ります。
+- 初回アクセス時に `GET /events?limit=50` (Nest backend) を叩いて最新 50 件を取得。
+- 取得したカーソルを `EventSource("/sse?after=<cursor>&tenantId=<uuid>")` に渡し、Redis Streams 経由の新着イベントを SSE で受け取る。
 
 ## 環境変数
 ```

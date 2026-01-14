@@ -102,7 +102,9 @@ export default function Dashboard({ initialEvents, initialCursor, tenantId, apiB
           payload: typeof payloadData === 'object' ? payloadData : { value: payloadData },
           created_at: new Date().toISOString(),
         };
-        cursorRef.current = String(aggregateId);
+        if (eventId) {
+          cursorRef.current = eventId;
+        }
         setEvents((prev) => [next, ...prev].slice(0, 200));
       } catch (error) {
         console.error('Failed to parse SSE payload', error);
@@ -133,11 +135,11 @@ export default function Dashboard({ initialEvents, initialCursor, tenantId, apiB
       <div className="space-y-2">
         <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">Realtime SSE Dashboard</p>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold text-slate-900">リアルタイムダッシュボード</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Server-Sent Events</h1>
           <Badge variant={statusVariant[status]}>{statusLabel[status]}</Badge>
         </div>
         <p className="text-sm text-slate-500">
-          初回は REST で最新 50 件、その後は SSE で新着を受信します。
+          初回は REST で最新 50 件、その後は SSE で新着を受信。
         </p>
       </div>
 

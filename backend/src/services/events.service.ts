@@ -35,7 +35,7 @@ export class EventsService {
     }));
 
     // descソートしているため0番目が最大
-    const cursor = items.length > 0 ? String(items[0].id) : null;
+    const cursor = items.length > 0 ? items[0].event_id : null;
     return { items, cursor };
   }
   // クライアントから送られてきたLastEventIdから

@@ -13,20 +13,23 @@
 
 ## クイックスタート
 ```bash
+cd infrastructure
+docker compose up --build
+
 cp backend/.env.example backend/.env
 
 cd backend
 npm install
+npm run build
 npm run migration:run
 # seedでサンプルデータを流すようにしている。
 # backend/scripts/seed.ts
 npm run seed  
+npm run start:dev
 
-cd ../frontend
+cd frontend
 npm install
-
-cd ../infrastructure
-docker compose up --build
+npm run start
 ```
 
 ## 環境変数
