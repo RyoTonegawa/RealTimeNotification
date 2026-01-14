@@ -7,7 +7,7 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiProduces, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 import { EventsService } from '../services/events.service';
 import { RedisStreamService } from '../services/redis-stream.service';
@@ -22,6 +22,50 @@ export class SseController {
   constructor(private readonly eventsService: EventsService, private readonly redis: RedisStreamService) {}
 
   @Get('sse')
+  @ApiOperation({
+    summary: 'SSEストリーム',
+    description: 'イベントストリームをSSEで配信します。Last-Event-IDまたはafterで再開位置を指定できます。',
+  })
+  @ApiProduces('text/event-stream')
+  @ApiHeader({
+    name: 'x-tenant-id',
+    description: 'テナントID',
+    schema: {
+      type: 'string',
+      example: '11111111-1111-1111-1111-111111111111',
+      default: '11111111-1111-1111-1111-111111111111',
+    },
+  })
+  @ApiHeader({
+    name: 'x-request-id',
+    description: 'リクエスト追跡用のULID',
+    schema: {
+      type: 'string',
+      example: '01KEYBG2G8QJY0NP4JYDW4R7G0',
+      default: '01KEYBG2G8QJY0NP4JYDW4R7G0',
+    },
+  })
+  @ApiHeader({
+    name: 'last-event-id',
+    description: '再接続時のイベントID',
+    required: false,
+    schema: {
+      type: 'string',
+      example: '01KEYBFVYN770TBFZ2BT2VTS9F',
+    },
+  })
+  @ApiQuery({
+    name: 'after',
+    description: '指定したevent_idより後を配信（Last-Event-IDより優先）',
+    required: false,
+    example: '01KEYBFVYN770TBFZ2BT2VTS9F',
+  })
+  @ApiQuery({
+    name: 'tenantId',
+    description: 'クエリ指定のテナントID（x-tenant-idが優先）',
+    required: false,
+    example: '11111111-1111-1111-1111-111111111111',
+  })
   async stream(
     // フロントから叩く場合とバックエンドで叩く場合両方に対応するために二つのヘッダを用意する
     @Headers('x-tenant-id') tenantHeader: string,

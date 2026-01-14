@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { DataTable } from '@/components/data-table';
 import { cn } from '@/lib/utils';
+import { ulid } from 'ulid';
 
 export type EventItem = {
   id: number;
@@ -76,6 +77,7 @@ export default function Dashboard({ initialEvents, initialCursor, tenantId, apiB
   useEffect(() => {
     const params = new URLSearchParams();
     params.set('tenantId', tenantId);
+    params.set('requestId', ulid());
     if (cursorRef.current) {
       params.set('after', cursorRef.current);
     }

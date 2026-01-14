@@ -1,4 +1,5 @@
 import Dashboard from '../components/Dashboard';
+import { ulid } from 'ulid';
 
 function requireEnv(name: string, value: string | undefined): string {
   if (!value) {
@@ -18,9 +19,11 @@ const INTERNAL_API_BASE_URL =
 const TENANT_ID = requireEnv('NEXT_PUBLIC_TENANT_ID', process.env.NEXT_PUBLIC_TENANT_ID);
 
 async function fetchInitialEvents() {
+  const requestId = ulid();
   const response = await fetch(`${INTERNAL_API_BASE_URL}/events?limit=50`, {
     headers: {
       'x-tenant-id': TENANT_ID,
+      'x-request-id': requestId,
     },
     cache: 'no-store',
     next: { revalidate: 0 },

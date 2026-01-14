@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '../config';
 import { EventsService } from '../services/events.service';
@@ -7,10 +7,15 @@ import { SseController } from '../controllers/sse.controller';
 import { RedisStreamService } from '../services/redis-stream.service';
 import { OutboxWorkerService } from '../services/outbox-worker.service';
 import { PrismaService } from '../services/prisma.service';
+import { RequestLoggerMiddleware } from '../middleware/request-logger.middleware';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true, load: [configuration] })],
   controllers: [EventsController, SseController],
   providers: [PrismaService, EventsService, RedisStreamService, OutboxWorkerService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+  }
+}
